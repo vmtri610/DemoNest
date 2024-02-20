@@ -1,23 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { AccountDomain, AccountRepository } from "../../domain/account.domain";
-import { DirectoryInt } from "../../utils/directory.utils";
+import {
+  Account,
+  AccountRepository,
+  Payment,
+} from '../../domain/account.domain';
+import { DirectoryInt } from '../../utils/directory.utils';
 
 @Injectable()
 export class InMemRepositoryService implements AccountRepository {
-  private accounts: DirectoryInt<AccountDomain>
+  private accounts: DirectoryInt<Account>;
+
   constructor() {
-    this.accounts = {}
+    this.accounts = {};
   }
-    getAccount(id: number): AccountDomain {
-      return this.accounts[id]
-    }
-    createAccount(account: AccountDomain) {
-      this.accounts[account.id] = account
-    }
-    updateAccount(account: AccountDomain) {
-      this.accounts[account.id] = account
-    }
-    deleteAccount(id: number) {
-      delete this.accounts[id]
-    }
+
+  getAccount(id: string): Promise<Account> {
+    return this.accounts[id];
+  }
+
+  createAccount(account: Account) {
+    this.accounts[account.id] = account;
+  }
+
+  updateAccount(account: Account) {
+    this.accounts[account.id] = account;
+  }
+
+  deleteAccount(id: string) {
+    delete this.accounts[id];
+  }
+
+  getAllAccounts(): Account[] {
+    return Object.values(this.accounts);
+  }
+
+  transfer(payment: Payment): any {
+    this.accounts[payment.from].balance -= payment.amount;
+    this.accounts[payment.to].balance += payment.amount;
+  }
 }

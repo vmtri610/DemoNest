@@ -1,21 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { AccountDomain, AccountInterop } from "../../domain/account.domain";
-import { AccountBaseUseCaseService } from "../base-use-case/base-use-case.service";
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  Account,
+  AccountInterop,
+  AccountUseCase,
+  Payment,
+} from '../../domain/account.domain';
+import { AuthUseCase, ErrMessUnauthorized } from '../../domain/auth.domain';
 
 @Injectable()
 export class AccountBaseInteropService implements AccountInterop {
-  constructor(private accountUseCase: AccountBaseUseCaseService) {
+  constructor(
+    @Inject('AccountUseCase') private accountUseCase: AccountUseCase,
+    @Inject('AuthUseCase') private authUseCase: AuthUseCase,
+  ) {}
+
+  async getAccount(token: string, id: string): Promise<Account> {
+    try {
+      let decodedToken = await this.authUseCase.verifyToken(token);
+      // if (decodedToken.uid != id) {
+      //   throw ErrMessUnauthorized;
+      // }
+
+      let account = await this.accountUseCase.getAccount(decodedToken.uid);
+      return account;
+    } catch (error) {
+      throw ErrMessUnauthorized;
+    }
   }
-    getAccount(token: string, id: number): AccountDomain {
-        return this.accountUseCase.getAccount(id)
+
+  async createAccount(token: string, account: Account) {
+    try {
+      let decodedToken = await this.authUseCase.verifyToken(token);
+      account.id = decodedToken.uid;
+      return this.accountUseCase.createAccount(account);
+    } catch (error) {
+      throw error;
     }
-    createAccount(token: string, account: AccountDomain) {
-        this.accountUseCase.createAccount(account)
-    }
-    updateAccount(token: string, account: AccountDomain) {
-        this.accountUseCase.updateAccount(account)
-    }
-    deleteAccount(token: string, id: number) {
-        this.accountUseCase.deleteAccount(id)
-    }
+  }
+
+  updateAccount(token: string, account: Account) {
+    this.accountUseCase.updateAccount(account);
+  }
+
+  deleteAccount(token: string, id: string) {
+    this.accountUseCase.deleteAccount(id);
+  }
+
+  getAllAccounts(token: string): Account[] {
+    return this.accountUseCase.getAllAccounts();
+  }
+
+  transfer(token: string, payment: Payment): any {
+    this.accountUseCase.transfer(payment);
+  }
 }
