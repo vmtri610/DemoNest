@@ -15,7 +15,7 @@ export interface Payment {
 export interface AccountRepository {
   getAccount(id: string): Promise<Account>;
 
-  getAllAccounts(): Account[];
+  getAllAccounts(): Promise<Account[]>;
 
   createAccount(account: Account): any;
 
@@ -29,7 +29,7 @@ export interface AccountRepository {
 export interface AccountUseCase {
   getAccount(id: string): Promise<Account>;
 
-  getAllAccounts(): Account[];
+  getAllAccounts(): Promise<Account[]>;
 
   createAccount(account: Account): any;
 
@@ -43,7 +43,7 @@ export interface AccountUseCase {
 export interface AccountInterop {
   getAccount(token: string, id: string): Promise<Account>;
 
-  getAllAccounts(token: string): Account[];
+  getAllAccounts(token: string): Promise<Account[]>;
 
   createAccount(token: string, account: Account): any;
 

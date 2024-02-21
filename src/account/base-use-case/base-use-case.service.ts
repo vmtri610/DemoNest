@@ -6,11 +6,9 @@ import {
   ErrAccountNotFound,
   ErrBalanceNotNegative,
   ErrBalanceNotNumber,
-  ErrExistedAccount,
   ErrInsufficientBalance,
   Payment,
 } from '../../domain/account.domain';
-import * as console from 'console';
 
 @Injectable()
 export class AccountBaseUseCaseService implements AccountUseCase {
@@ -31,7 +29,6 @@ export class AccountBaseUseCaseService implements AccountUseCase {
   }
 
   getAccount(id: string): Promise<Account> {
-    console.log('id', id);
     let account = this.accountRepo.getAccount(id);
     if (!account) {
       throw ErrAccountNotFound;
@@ -39,21 +36,23 @@ export class AccountBaseUseCaseService implements AccountUseCase {
     return this.accountRepo.getAccount(id);
   }
 
-  createAccount(account: Account) {
-    let existingAccount = this.accountRepo.getAccount(account.id);
-    let balance = account.balance;
-    console.log('balance', balance);
-    if (balance < 0) {
-      throw ErrBalanceNotNegative;
+  async createAccount(account: Account) {
+    try {
+      await this.accountRepo.getAccount(account.id);
+    } catch (e) {
+      try {
+        let balance = account.balance;
+        if (balance < 0) {
+          throw ErrBalanceNotNegative;
+        }
+        if (balance === null || isNaN(balance)) {
+          throw ErrBalanceNotNumber;
+        }
+        return this.accountRepo.createAccount(account);
+      } catch (g) {
+        throw g;
+      }
     }
-    if (balance === null || isNaN(balance)) {
-      throw ErrBalanceNotNumber;
-    }
-    if (existingAccount) {
-      console.log('Account existed');
-      throw ErrExistedAccount;
-    }
-    this.accountRepo.createAccount(account);
   }
 
   updateAccount(account: Account) {
@@ -71,7 +70,7 @@ export class AccountBaseUseCaseService implements AccountUseCase {
     this.accountRepo.deleteAccount(id);
   }
 
-  getAllAccounts(): Account[] {
+  getAllAccounts(): Promise<Account[]> {
     return this.accountRepo.getAllAccounts();
   }
 }

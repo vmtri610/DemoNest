@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AccountBaseInteropService } from './account-base-interop/account-base-interop.service';
-import { InMemRepositoryService } from './in-mem-repository/in-mem-repository.service';
 import { AccountBaseUseCaseService } from './base-use-case/base-use-case.service';
 import { AccountController } from './account.controller';
 import { AuthModule } from '../auth/auth.module';
+import { FirestoreRepositoryService } from './firestore-repository/firestore-repository.service';
 
 @Module({
   providers: [
     {
       provide: 'AccountRepository',
-      useClass: InMemRepositoryService,
+      useClass: FirestoreRepositoryService,
     },
     {
       provide: 'AccountUseCase',

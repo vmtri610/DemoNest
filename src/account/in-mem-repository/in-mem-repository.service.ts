@@ -30,8 +30,8 @@ export class InMemRepositoryService implements AccountRepository {
     delete this.accounts[id];
   }
 
-  getAllAccounts(): Account[] {
-    return Object.values(this.accounts);
+  getAllAccounts(): Promise<Account[]> {
+    return;
   }
 
   transfer(payment: Payment): any {

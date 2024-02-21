@@ -44,7 +44,8 @@ export class AccountController {
   }
 
   @Delete(':id')
-  deleteAccount(@Param('id') id: string) {
-    return this.accountInterop.deleteAccount('token', id);
+  deleteAccount(@Headers() headers: any, @Param('id') id: string) {
+    let token = headers['authorization'];
+    return this.accountInterop.deleteAccount(headers['authorization'], id);
   }
 }

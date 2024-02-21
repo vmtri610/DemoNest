@@ -17,12 +17,7 @@ export class AccountBaseInteropService implements AccountInterop {
   async getAccount(token: string, id: string): Promise<Account> {
     try {
       let decodedToken = await this.authUseCase.verifyToken(token);
-      // if (decodedToken.uid != id) {
-      //   throw ErrMessUnauthorized;
-      // }
-
-      let account = await this.accountUseCase.getAccount(decodedToken.uid);
-      return account;
+      return await this.accountUseCase.getAccount(decodedToken.uid);
     } catch (error) {
       throw ErrMessUnauthorized;
     }
@@ -42,11 +37,12 @@ export class AccountBaseInteropService implements AccountInterop {
     this.accountUseCase.updateAccount(account);
   }
 
-  deleteAccount(token: string, id: string) {
-    this.accountUseCase.deleteAccount(id);
+  async deleteAccount(token: string, id: string) {
+    let decodedToken = await this.authUseCase.verifyToken(token);
+    this.accountUseCase.deleteAccount(decodedToken.uid);
   }
 
-  getAllAccounts(token: string): Account[] {
+  getAllAccounts(token: string): Promise<Account[]> {
     return this.accountUseCase.getAllAccounts();
   }
 

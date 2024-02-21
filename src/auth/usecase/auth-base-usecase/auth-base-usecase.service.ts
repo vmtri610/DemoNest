@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthRepository, AuthUseCase } from '../../../domain/auth.domain';
 import { DecodedIdToken } from 'firebase-admin/lib/auth';
-import { Injector } from '@nestjs/core/injector/injector';
 
 @Injectable()
 export class AuthBaseUsecaseService implements AuthUseCase {
